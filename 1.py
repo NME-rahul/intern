@@ -1,7 +1,7 @@
 import openai
 from flask import Flask, render_template, request
 
-openai.api_key = "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"
+openai.api_key = "your_api_key"
 model = "gpt-3.5-turbo"
 
 app = Flask(__name__)
@@ -10,27 +10,24 @@ app = Flask(__name__)
 def home():
     return render_template('index.html')
 
-@app.route('/helpdesk', methods=['POST'])
+@app.route('/', methods=['POST'])
 def ChatGPT():
     prompt = request.form['prompt']
     try:
         response = openai.Completion.create(
-        engine=model,
-        prompt=prompt,
-        max_tokens=100,
+        model=model,
+        prompt=str(prompt),
+        max_tokens=1000,
         n=1,
-        stop=None,
+        stop='\n',
         temperature=0.5
         )
         answer = response.choices[0].text.split('\n')[0]
-        return render_template('result.html', prompt=prompt, generated_text=answer)
+        return render_template('index.html', prompt=prompt, result=answer)
 
     except Exception as error:
-        return render_template('result.html', prompt=prompt, generated_text=error)
+        return render_template('index.html', prompt=prompt, result=error)
 	
     
 if __name__ == "__main__":
-    app.run(debug=True)
-
-
-
+    app.run(port=4533, debug=True)
